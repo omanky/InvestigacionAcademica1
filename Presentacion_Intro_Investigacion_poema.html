@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investigación Académica — una introducción</title>
+<!--
+  ============================================================
+  PRESENTACIÓN (versión "poema digital")
+  Investigación Académica — una introducción
+  Omar Manky, 2026
+
+  Variante estética de Presentacion_Intro_Investigacion.html:
+  - Fondo tinta, tipografía serif, ritmo de versos.
+  - Cada línea aparece escalonada al entrar a la diapositiva
+    (clase "v" + variable --d que define el orden de aparición).
+  - Las ilustraciones son SVG abstractos dibujados a mano
+    (constelaciones, trazos, glifos), sin imágenes externas.
+
+  CÓMO EDITAR:
+  - Cada diapositiva es un <section class="slide"> dentro de <main>.
+  - Para que un elemento "entre" con el verso N, dale
+    class="v" style="--d:N".
+  - Paleta y tipografía: variables CSS en :root.
+
+  NAVEGACIÓN: botones ‹ › · teclas ← → · barra espaciadora.
+  ============================================================
+-->
+<style>
+  /* ============ VARIABLES (edita aquí la paleta) ============ */
+  :root{
+    --tinta-fondo:  #10151f;   /* fondo: azul tinta casi negro      */
+    --marfil:       #ece7da;   /* texto principal, cálido           */
+    --marfil-suave: #9aa2af;   /* texto secundario                  */
+    --oro:          #c9a45c;   /* ÚNICO acento: oro viejo           */
+    --oro-tenue:    rgba(201,164,92,.35);
+    --velo:         rgba(236,231,218,.12);  /* líneas finas         */
+    --t-titulo-portada: clamp(3rem, 8vw, 6rem);
+    --t-titulo:         clamp(1.9rem, 4vw, 2.8rem);
+    --t-cuerpo:         clamp(1.05rem, 1.8vw, 1.35rem);
+    --t-peque:          clamp(.8rem, 1.2vw, .95rem);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family: Georgia, "Palatino Linotype", "Times New Roman", serif;
+    background:
+      radial-gradient(1200px 700px at 75% 10%, rgba(201,164,92,.06), transparent 60%),
+      var(--tinta-fondo);
+    color: var(--marfil);
+    overflow:hidden;
+  }
+
+  /* ============ ESCENARIO Y DIAPOSITIVAS ============ */
+  main{ position:fixed; inset:0; bottom:62px; }
+  .slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; justify-content:center;
+    padding: 5vh 9vw 4vh;
+    opacity:0; visibility:hidden;
+    transition: opacity .7s ease, visibility .7s;
+    overflow-y:auto;
+  }
+  .slide.activa{ opacity:1; visibility:visible; }
+
+  /* —— El mecanismo del poema: cada "verso" entra escalonado —— */
+  .v{
+    opacity:0; transform: translateY(16px);
+    transition: opacity .9s ease, transform .9s ease;
+    transition-delay: calc(var(--d, 0) * .22s);
+  }
+  .slide.activa .v{ opacity:1; transform:none; }
+
+  /* Etiqueta de sección, como acotación de poema */
+  .kicker{
+    color: var(--oro);
+    font-size: var(--t-peque);
+    letter-spacing: .38em;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+  .slide h2{
+    font-size: var(--t-titulo);
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: 1.8rem;
+    max-width: 32ch;       /* aire suficiente para títulos largos sin cortes feos */
+    text-wrap: balance;    /* equilibra las líneas del título (si el navegador lo soporta) */
+  }
+  .slide h2 i{ color: var(--oro); font-style: italic; }
+
+  .slide p, .slide li{ font-size: var(--t-cuerpo); line-height: 1.75; }
+
+  /* Versos: lista sin viñetas, con sangría poética y guion largo */
+  ul.versos{ list-style:none; max-width: 62ch; }
+  ul.versos li{ margin-bottom: 1.05em; padding-left: 1.6em; position:relative; }
+  ul.versos li::before{
+    content:"—"; position:absolute; left:0; color: var(--oro);
+  }
+  strong{ color: var(--oro); font-weight: 600; }
+  em{ color: var(--marfil); }
+
+  /* Cita: centrada, como estrofa aparte */
+  .cita{
+    margin-top: 2.2rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--velo);
+    font-style: italic; color: var(--marfil-suave);
+    max-width: 58ch; font-size: var(--t-cuerpo);
+    line-height: 1.7;
+  }
+  .cita b{ color: var(--oro); font-weight:600; }
+  .cita .autor{
+    display:block; margin-top:.6rem; font-style:normal;
+    font-size: var(--t-peque); letter-spacing:.18em; text-transform:uppercase;
+    color: var(--oro); font-family:"Segoe UI", system-ui, sans-serif;
+  }
+  .nota{
+    margin-top: 1.6rem; color: var(--marfil-suave);
+    font-size: var(--t-peque); line-height: 1.6; max-width: 70ch;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  /* Pie de diapositiva: acotación al margen, como nota al pie de un poema.
+     Mantiene la paleta (velo + oro) y entra con el mismo mecanismo de versos. */
+  .pie{
+    margin-top: 1.3rem; padding-top: .9rem;
+    border-top: 1px dotted var(--oro-tenue);
+    color: var(--marfil-suave);
+    font-size: calc(var(--t-peque) * .95);
+    line-height: 1.65; max-width: 74ch;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+  .pie::before{ content:"✳"; color: var(--oro); margin-right: .6em; }
+  .pie i{ color: var(--marfil); }
+
+  /* ============ GLIFOS SVG (las "imágenes" abstractas) ============ */
+  .glifo{ display:block; margin-bottom: .8rem; }
+  .glifo *{ vector-effect: non-scaling-stroke; }
+  /* dibujo de trazos al activarse la slide */
+  .traza{
+    stroke-dasharray: 600; stroke-dashoffset: 600;
+  }
+  .slide.activa .traza{
+    animation: trazar 2.4s ease forwards;
+    animation-delay: calc(var(--d, 0) * .22s + .3s);
+  }
+  @keyframes trazar{ to{ stroke-dashoffset: 0; } }
+  /* parpadeo lento de estrellas (portada y cierre) */
+  .lucero{ animation: titilar 5s ease-in-out infinite; transform-origin:center; }
+  .lucero.l2{ animation-delay: 1.3s; }
+  .lucero.l3{ animation-delay: 2.6s; }
+  @keyframes titilar{ 0%,100%{ opacity:.35 } 50%{ opacity:1 } }
+
+  /* ============ ESTROFAS EN COLUMNAS (pilares, tipos) ============ */
+  .estrofas{ display:grid; gap: 2rem 2.6rem; margin-top:.6rem; }
+  .estrofas.c4{ grid-template-columns: repeat(4, 1fr); }
+  .estrofa h3{
+    font-size: calc(var(--t-cuerpo) * 1.04);
+    font-weight: 600; color: var(--oro); margin-bottom: .4rem;
+  }
+  .estrofa p{
+    font-size: calc(var(--t-cuerpo) * .82);
+    color: var(--marfil-suave); line-height: 1.6;
+  }
+
+  /* ============ TABLAS (libro de cuentas antiguo) ============ */
+  table{
+    width:100%; border-collapse:collapse;
+    font-size: calc(var(--t-cuerpo) * .84);
+  }
+  th, td{
+    padding: .85em 1em; text-align:left; vertical-align:top;
+    border-bottom: 1px solid var(--velo); line-height: 1.55;
+  }
+  thead th{
+    color: var(--oro); font-weight:600;
+    border-bottom: 1px solid var(--oro-tenue);
+    font-size: calc(var(--t-cuerpo) * .9);
+  }
+  td.dim{
+    color: var(--oro); white-space:nowrap; width:1%;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: var(--t-peque); letter-spacing:.14em; text-transform:uppercase;
+    padding-top: 1em;
+  }
+  td b{ color: var(--marfil); }
+  tbody td{ color: var(--marfil-suave); }
+  tbody td:first-child ~ td{ color: var(--marfil); }
+  table.dos tbody td:nth-child(2), table.dos tbody td:nth-child(3){ color:#cfc9bb; }
+
+  /* ============ ESQUELETO (columna vertebral) ============ */
+  .columna{ display:flex; gap: 2.2rem; align-items:stretch; margin-top:.4rem; }
+  .columna .espina{ flex: 0 0 auto; }
+  .columna ol{ list-style:none; display:flex; flex-direction:column; justify-content:space-between; }
+  .columna ol li{
+    font-size: calc(var(--t-cuerpo) * .9); line-height:1.45;
+    color: var(--marfil-suave); max-width: 64ch;
+  }
+  .columna ol li b{ color: var(--marfil); font-weight:600; }
+  .columna ol li b u{ color: var(--oro); text-decoration:none; }
+
+  /* ============ EMBUDO (versos que se estrechan) ============ */
+  .embudo-poema{ display:flex; flex-direction:column; align-items:center; gap:.9rem; margin-top:1rem; text-align:center; }
+  .verso-embudo{ line-height:1.5; }
+  .verso-embudo small{ display:block; color: var(--marfil-suave); font-style:italic; font-size:.8em; }
+  .e1{ font-size: calc(var(--t-cuerpo) * 1.25); letter-spacing:.06em; }
+  .e2{ font-size: calc(var(--t-cuerpo) * 1.05); }
+  .e3{ font-size: calc(var(--t-cuerpo) * .92); color: var(--marfil); }
+  .e4{ font-size: calc(var(--t-cuerpo) * 1.1); color: var(--oro); }
+  .gota{ color: var(--oro); font-size:.9em; }
+
+  /* ============ PORTADA ============ */
+  .portada{ text-align:center; align-items:center; }
+  .portada h1{
+    font-size: var(--t-titulo-portada);
+    font-weight: 400; line-height: 1.05; letter-spacing:.01em;
+  }
+  .portada h1 .linea2{ color: var(--oro); font-style: italic; display:block; }
+  .portada .subtitulo{
+    margin-top: 1.6rem; color: var(--marfil-suave);
+    font-style: italic; font-size: calc(var(--t-cuerpo) * 1.25);
+    letter-spacing: .14em;
+  }
+  .portada .credito{
+    margin-top: 3rem; color: var(--marfil-suave);
+    font-size: var(--t-peque); letter-spacing: .32em; text-transform: uppercase;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  /* ============ NAVEGACIÓN ============ */
+  nav{
+    position:fixed; left:0; right:0; bottom:0; height:62px;
+    display:flex; align-items:center; justify-content:center; gap:1.3rem;
+    background: rgba(16,21,31,.92);
+    border-top: 1px solid var(--velo);
+    z-index:10; font-family:"Segoe UI", system-ui, sans-serif;
+  }
+  .btn-nav{
+    width:44px; height:44px; border-radius:50%;
+    border:1px solid var(--oro-tenue); background:transparent;
+    color: var(--oro); font-size:1.5rem; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition: border-color .25s, background .25s, opacity .25s;
+  }
+  .btn-nav:hover:not(:disabled){ border-color: var(--oro); background: rgba(201,164,92,.12); }
+  .btn-nav:disabled{ opacity:.2; cursor:default; }
+  .btn-nav:focus-visible, .punto:focus-visible{
+    outline:2px solid var(--oro); outline-offset:3px;
+  }
+  #contador{
+    font-variant-numeric: tabular-nums; color: var(--marfil-suave);
+    font-size:.95rem; min-width:4.5em; text-align:center; letter-spacing:.1em;
+  }
+  #puntos{ display:flex; gap:.6rem; }
+  .punto{
+    width:8px; height:8px; border-radius:50%; padding:0; border:none;
+    background: var(--velo); cursor:pointer; transition: background .25s, transform .25s;
+  }
+  .punto.activo{ background: var(--oro); transform: scale(1.4); }
+  .ayuda-teclado{
+    position:fixed; right:16px; bottom:72px; z-index:9;
+    font-size:.74rem; color:var(--marfil-suave); opacity:.7;
+    font-family:"Segoe UI", system-ui, sans-serif;
+  }
+  .ayuda-teclado kbd{
+    border:1px solid var(--velo); border-radius:4px; padding:1px 6px; font-family:inherit;
+  }
+
+  /* ============ RESPONSIVO ============ */
+  /* Ventanas bajas: alinear arriba para que nada quede inalcanzable al hacer scroll */
+  @media (max-height: 760px){
+    .slide{ justify-content:flex-start; padding-top:4vh; }
+    .slide h2{ margin-bottom:1.1rem; }
+  }
+  @media (max-width: 980px){
+    .estrofas.c4{ grid-template-columns: repeat(2, 1fr); }
+    .slide{ justify-content:flex-start; padding-top:6vh; }
+  }
+  @media (max-width: 620px){
+    .estrofas.c4{ grid-template-columns: 1fr; }
+    table{ font-size:.78rem; }
+    th, td{ padding:.5em .55em; }
+    td.dim{ white-space:normal; }
+    #puntos{ display:none; }
+    .ayuda-teclado{ display:none; }
+    .columna .espina{ display:none; }
+    .columna ol{ gap:1rem; }
+    .slide h2{ margin-bottom:1.2rem; }
+    ul.versos li{ margin-bottom:.85em; }
+    .cita{ margin-top:1.5rem; padding-top:1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<main id="escenario">
+
+  <!-- ============ SLIDE 1: PORTADA ============ -->
+  <section class="slide portada">
+    <!-- Constelación: el conocimiento como puntos que se conectan -->
+    <svg class="glifo v" style="--d:0" width="min(420px,70vw)" height="150" viewBox="0 0 420 150" fill="none" aria-hidden="true">
+      <g stroke="#c9a45c" stroke-width="0.7" opacity=".5">
+        <path class="traza" d="M40 110 L120 40 L205 88 L290 30 L375 95"/>
+        <path class="traza" d="M120 40 L180 125 L290 30"/>
+      </g>
+      <g fill="#ece7da">
+        <circle class="lucero"    cx="40"  cy="110" r="3"/>
+        <circle class="lucero l2" cx="120" cy="40"  r="4"/>
+        <circle class="lucero l3" cx="205" cy="88"  r="3"/>
+        <circle class="lucero"    cx="180" cy="125" r="2.4"/>
+        <circle class="lucero l2" cx="290" cy="30"  r="4"/>
+        <circle class="lucero l3" cx="375" cy="95"  r="3"/>
+      </g>
+      <circle cx="290" cy="30" r="9" stroke="#c9a45c" stroke-width="0.8" class="traza"/>
+    </svg>
+    <h1>
+      <span class="v" style="--d:1">Investigación</span>
+      <span class="linea2 v" style="--d:2">académica</span>
+    </h1>
+    <p class="subtitulo v" style="--d:3">una introducción</p>
+    <p class="credito v" style="--d:4">Omar Manky · 2026</p>
+  </section>
+
+  <!-- ============ SLIDE 2: (a) QUÉ ES LA CIENCIA ============ -->
+  <section class="slide">
+    <!-- Ondas: la información como marea -->
+    <svg class="glifo v" style="--d:0" width="220" height="56" viewBox="0 0 220 56" fill="none" aria-hidden="true">
+      <g stroke="#c9a45c" stroke-width="1.1">
+        <path class="traza" d="M4 14 Q 32 2, 60 14 T 116 14 T 172 14 T 216 14" opacity=".9"/>
+        <path class="traza" d="M4 30 Q 32 18, 60 30 T 116 30 T 172 30 T 216 30" opacity=".55"/>
+        <path class="traza" d="M4 46 Q 32 34, 60 46 T 116 46 T 172 46 T 216 46" opacity=".3"/>
+      </g>
+    </svg>
+    <p class="kicker v" style="--d:1">a · ¿qué es la ciencia?</p>
+    <h2 class="v" style="--d:2">Una práctica colectiva <i>para poner a prueba lo que creemos saber</i></h2>
+    <ul class="versos">
+      <li class="v" style="--d:3">La ciencia organiza datos, métodos y <strong>discusión pública</strong> para decidir qué afirmaciones resisten mejor la prueba.</li>
+      <li class="v" style="--d:4">Llamamos científica a una fuente cuando sus afirmaciones han sido examinadas con <strong>reglas compartidas</strong> por una comunidad académica.</li>
+      <li class="v" style="--d:5">Y hoy importa más que nunca: cada año se publican más de <strong>cinco millones de papers</strong> — uno cada seis segundos. Ahogados en información, sedientos de conocimiento.</li>
+    </ul>
+    <p class="cita v" style="--d:6">Una afirmación científica necesita mostrar sus razones, sus datos y el <b>camino</b> que llevó a la conclusión.</p>
+  </section>
+
+  <!-- ============ SLIDE 3: (a) PILARES DEL MÉTODO ============ -->
+  <section class="slide">
+    <p class="kicker v" style="--d:0">a · ¿qué es la ciencia?</p>
+    <h2 class="v" style="--d:1">Cuatro pilares <i>sostienen el método</i></h2>
+    <div class="estrofas c4">
+      <div class="estrofa v" style="--d:2">
+        <!-- Dos círculos que se intersecan: dos miradas sobre lo mismo -->
+        <svg class="glifo" width="72" height="48" viewBox="0 0 72 48" fill="none" aria-hidden="true">
+          <circle class="traza" cx="27" cy="24" r="17" stroke="#c9a45c" stroke-width="1.1"/>
+          <circle class="traza" cx="45" cy="24" r="17" stroke="#ece7da" stroke-width="0.9" opacity=".6"/>
+        </svg>
+        <h3>Revisión por pares</h3>
+        <p>Otros ojos, anónimos y expertos, examinan el método antes de que algo se publique.</p>
+      </div>
+      <div class="estrofa v" style="--d:3">
+        <!-- Arcos repetidos: el mismo gesto, una y otra vez -->
+        <svg class="glifo" width="72" height="48" viewBox="0 0 72 48" fill="none" aria-hidden="true">
+          <g stroke="#c9a45c" stroke-width="1.1">
+            <path class="traza" d="M8 40 A 22 22 0 0 1 52 40"/>
+            <path class="traza" d="M16 40 A 14 14 0 0 1 44 40" opacity=".6"/>
+            <path class="traza" d="M24 40 A 6 6 0 0 1 36 40" opacity=".35"/>
+          </g>
+        </svg>
+        <h3>Replicabilidad</h3>
+        <p>La prueba científica exige que el procedimiento pueda repetirse y someterse a contraste.</p>
+      </div>
+      <div class="estrofa v" style="--d:4">
+        <!-- Trazos que se apilan: el saber se acumula -->
+        <svg class="glifo" width="72" height="48" viewBox="0 0 72 48" fill="none" aria-hidden="true">
+          <g stroke="#c9a45c" stroke-width="1.1">
+            <line class="traza" x1="10" y1="42" x2="62" y2="42"/>
+            <line class="traza" x1="16" y1="33" x2="56" y2="33" opacity=".75"/>
+            <line class="traza" x1="22" y1="24" x2="50" y2="24" opacity=".5"/>
+            <line class="traza" x1="28" y1="15" x2="44" y2="15" opacity=".3"/>
+          </g>
+        </svg>
+        <h3>Acumulación</h3>
+        <p>Las experiencias individuales importan como punto de partida; la evidencia aparece cuando encontramos patrones verificables.</p>
+      </div>
+      <div class="estrofa v" style="--d:5">
+        <!-- Círculos concéntricos abiertos: nada que esconder -->
+        <svg class="glifo" width="72" height="48" viewBox="0 0 72 48" fill="none" aria-hidden="true">
+          <g stroke="#c9a45c" stroke-width="1.1">
+            <circle class="traza" cx="36" cy="24" r="19" opacity=".35"/>
+            <circle class="traza" cx="36" cy="24" r="11" opacity=".65"/>
+            <circle class="traza" cx="36" cy="24" r="3.5"/>
+          </g>
+        </svg>
+        <h3>Transparencia</h3>
+        <p>Mostrar el camino completo: datos, métodos y decisiones a la vista de todos.</p>
+      </div>
+    </div>
+    <p class="nota v" style="--d:6">Evidencia de que funciona: emprendedores entrenados en el método científico decidieron mejor
+       y generaron más ingresos que el grupo de control (Camuffo et al., 2019, <i>Management Science</i>).</p>
+  </section>
+
+  <!-- ============ SLIDE 4: (a) CIENCIA COMO VALIDACIÓN ============ -->
+  <section class="slide">
+    <!-- Péndulo lento: la lentitud deliberada -->
+    <svg class="glifo v" style="--d:0" width="120" height="58" viewBox="0 0 120 58" fill="none" aria-hidden="true">
+      <line class="traza" x1="14" y1="6" x2="106" y2="6" stroke="#c9a45c" stroke-width="1.1"/>
+      <path class="traza" d="M60 6 L36 46" stroke="#ece7da" stroke-width="0.8" opacity=".5"/>
+      <path class="traza" d="M60 6 L84 46" stroke="#ece7da" stroke-width="0.8" opacity=".5"/>
+      <circle class="lucero" cx="36" cy="48" r="4" fill="#c9a45c"/>
+      <circle class="lucero l2" cx="84" cy="48" r="4" fill="#c9a45c" opacity=".6"/>
+    </svg>
+    <p class="kicker v" style="--d:1">a · ¿qué es la ciencia?</p>
+    <h2 class="v" style="--d:2">Un proceso colectivo <i>y autocorrectivo</i></h2>
+    <div class="v" style="--d:3">
+      <table>
+        <thead>
+          <tr><th>Mundo digital</th><th>Método científico</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Velocidad</td><td>Lentitud — a propósito</td></tr>
+          <tr><td>Premia la primera respuesta</td><td>Premia la revisión múltiple</td></tr>
+          <tr><td>Busca viralidad</td><td>Busca acumulación de evidencia</td></tr>
+          <tr><td>Opiniones individuales</td><td>Consenso experto</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cita v" style="--d:4">La ciencia avanza despacio porque somete cada afirmación a <b>revisión, contraste y corrección</b>.
+      Es un sistema diseñado por humanos sesgados para superar sus propios sesgos.</p>
+  </section>
+
+  <!-- ============ SLIDE 5: (b) QUÉ ES UN TRABAJO ACADÉMICO ============ -->
+  <section class="slide">
+    <!-- Red de nodos: la conversación entre autores -->
+    <svg class="glifo v" style="--d:0" width="200" height="64" viewBox="0 0 200 64" fill="none" aria-hidden="true">
+      <g stroke="#c9a45c" stroke-width="0.8" opacity=".55">
+        <path class="traza" d="M20 44 L70 16 L120 48 L178 22"/>
+        <path class="traza" d="M70 16 L120 48 M70 16 L178 22"/>
+      </g>
+      <circle class="lucero" cx="20" cy="44" r="3.5" fill="#9aa2af"/>
+      <circle class="lucero l2" cx="70" cy="16" r="4.5" fill="#ece7da"/>
+      <circle class="lucero l3" cx="120" cy="48" r="3.5" fill="#9aa2af"/>
+      <circle cx="178" cy="22" r="5" fill="none" stroke="#c9a45c" stroke-width="1.2" class="traza"/>
+      <circle class="lucero" cx="178" cy="22" r="2" fill="#c9a45c"/>
+    </svg>
+    <p class="kicker v" style="--d:1">b · ¿qué es un trabajo académico?</p>
+    <h2 class="v" style="--d:2">Un texto que <i>conversa</i> con otros autores</h2>
+    <ul class="versos">
+      <li class="v" style="--d:3"><strong>Rigor:</strong> pregunta delimitada — qué, dónde, cuándo — y conceptos definidos con precisión, sin “palabras maleta”.</li>
+      <li class="v" style="--d:4"><strong>Evidencia:</strong> afirma solo lo que puede sostener con datos, y explica su metodología.</li>
+      <li class="v" style="--d:5"><strong>Citas:</strong> honestidad intelectual y construcción acumulativa. <em>Nadie piensa en el vacío.</em></li>
+      <li class="v" style="--d:6"><strong>Transparencia:</strong> el lector puede verificar cada fuente, cada paso.</li>
+    </ul>
+    <p class="cita v" style="--d:7">Un paper interviene en una <b>conversación académica</b> previa: responde, corrige o amplía lo que otros ya discutieron.
+      “La investigación previa se enfocó en X… nosotros estudiamos lo que faltaba.”</p>
+  </section>
+
+  <!-- ============ SLIDE 6: (b) ACADÉMICO VS. OPINIÓN ============ -->
+  <section class="slide">
+    <!-- Dos trazos: uno libre, otro tamizado -->
+    <svg class="glifo v" style="--d:0" width="200" height="52" viewBox="0 0 200 52" fill="none" aria-hidden="true">
+      <path class="traza" d="M6 18 Q 40 2, 74 20 T 140 14 T 196 22" stroke="#9aa2af" stroke-width="0.9" opacity=".5"/>
+      <path class="traza" d="M6 40 L60 40 M76 40 L130 40 M146 40 L196 40" stroke="#c9a45c" stroke-width="1.2"/>
+    </svg>
+    <p class="kicker v" style="--d:1">b · ¿qué es un trabajo académico?</p>
+    <h2 class="v" style="--d:2">No todo lo que parece serio <i>es académico</i></h2>
+    <div class="v" style="--d:3">
+      <table>
+        <thead>
+          <tr><th>Opinión / divulgación</th><th>Texto académico</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Escrito por periodistas o ensayistas (The Economist, blogs, prensa)</td>
+              <td>Escrito por investigadores (Journal of Finance, Apuntes)</td></tr>
+          <tr><td>Sin filtro externo: vale la firma del autor</td>
+              <td>Revisión por pares ciega antes de publicarse</td></tr>
+          <tr><td>Lenguaje general, sin referencias formales</td>
+              <td>Abstract, metodología, bibliografía, indexación</td></tr>
+          <tr><td>Útil para contexto y actualidad</td>
+              <td>Cimienta argumentos teóricos</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota v" style="--d:4">Si un profesor de Harvard escribe una columna en el New York Times, sigue siendo opinión.
+       La autoridad del texto proviene de su <b>método, sus fuentes y su proceso de evaluación</b>.</p>
+  </section>
+
+  <!-- ============ SLIDE 7: (c) TIPOS DE TEXTO ACADÉMICO ============ -->
+  <section class="slide">
+    <p class="kicker v" style="--d:0">c · tipos de texto académico</p>
+    <h2 class="v" style="--d:1">El mismo oficio, <i>distintas escalas</i></h2>
+    <p class="v" style="--d:2; max-width:60ch">Comparten rigor, evidencia y citas;
+       difieren en <strong>extensión, propósito y quién los evalúa</strong>.</p>
+    <div class="estrofas c4" style="margin-top:2rem">
+      <div class="estrofa v" style="--d:3">
+        <!-- Una hoja: el paper -->
+        <svg class="glifo" width="60" height="56" viewBox="0 0 60 56" fill="none" aria-hidden="true">
+          <rect class="traza" x="16" y="4" width="28" height="40" stroke="#c9a45c" stroke-width="1.1"/>
+          <g stroke="#9aa2af" stroke-width="0.8" opacity=".6">
+            <line class="traza" x1="21" y1="14" x2="39" y2="14"/>
+            <line class="traza" x1="21" y1="21" x2="39" y2="21"/>
+            <line class="traza" x1="21" y1="28" x2="33" y2="28"/>
+          </g>
+        </svg>
+        <h3>Artículo (paper)</h3>
+        <p>Comunica un hallazgo original a la comunidad científica.</p>
+      </div>
+      <div class="estrofa v" style="--d:4">
+        <!-- Lomos en fila: el libro -->
+        <svg class="glifo" width="60" height="56" viewBox="0 0 60 56" fill="none" aria-hidden="true">
+          <g stroke="#c9a45c" stroke-width="1.1">
+            <rect class="traza" x="10" y="8" width="9" height="38"/>
+            <rect class="traza" x="23" y="12" width="9" height="34" opacity=".7"/>
+            <path class="traza" d="M38 12 L47 9 L52 44 L43 47 Z" opacity=".5"/>
+          </g>
+        </svg>
+        <h3>Libro académico</h3>
+        <p>Desarrolla un tema en profundidad, con mirada de largo aliento.</p>
+      </div>
+      <div class="estrofa v" style="--d:5">
+        <!-- Hoja pequeña dentro del contorno de una grande: el minipaper -->
+        <svg class="glifo" width="60" height="56" viewBox="0 0 60 56" fill="none" aria-hidden="true">
+          <rect class="traza" x="14" y="4" width="32" height="44" stroke="#9aa2af" stroke-width="0.8" opacity=".4" stroke-dasharray="3 3"/>
+          <rect class="traza" x="21" y="18" width="18" height="24" stroke="#c9a45c" stroke-width="1.1"/>
+          <line class="traza" x1="25" y1="26" x2="35" y2="26" stroke="#9aa2af" stroke-width="0.8" opacity=".6"/>
+          <line class="traza" x1="25" y1="32" x2="32" y2="32" stroke="#9aa2af" stroke-width="0.8" opacity=".6"/>
+        </svg>
+        <h3>Minipaper</h3>
+        <p>Ejercicio breve de curso: entrena los músculos del paper.</p>
+      </div>
+      <div class="estrofa v" style="--d:6">
+        <!-- Columna con capitel: la tesis como edificio -->
+        <svg class="glifo" width="60" height="56" viewBox="0 0 60 56" fill="none" aria-hidden="true">
+          <g stroke="#c9a45c" stroke-width="1.1">
+            <line class="traza" x1="14" y1="8" x2="46" y2="8"/>
+            <line class="traza" x1="24" y1="12" x2="24" y2="44" opacity=".7"/>
+            <line class="traza" x1="30" y1="12" x2="30" y2="44"/>
+            <line class="traza" x1="36" y1="12" x2="36" y2="44" opacity=".7"/>
+            <line class="traza" x1="10" y1="48" x2="50" y2="48"/>
+          </g>
+        </svg>
+        <h3>Tesis</h3>
+        <p>Demuestra que mereces un grado, ante un jurado.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8: (c) TABLA COMPARATIVA 1/2 ============ -->
+  <section class="slide">
+    <p class="kicker v" style="--d:0">c · comparación — primera parte</p>
+    <h2 class="v" style="--d:1">Artículo y libro: <i>publicar para la comunidad</i></h2>
+    <div class="v" style="--d:2">
+      <table class="dos">
+        <thead>
+          <tr><th></th><th>Artículo académico (paper)</th><th>Libro académico (monografía)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="dim">Extensión</td>
+              <td>~6–20 páginas (4,000–10,000 palabras)</td>
+              <td>~150–400 páginas</td></tr>
+          <tr><td class="dim">Propósito</td>
+              <td>Comunicar <b>un</b> hallazgo o argumento original y acotado</td>
+              <td>Desarrollar un tema amplio en profundidad; articular años de investigación</td></tr>
+          <tr><td class="dim">Dónde vive</td>
+              <td>Revista científica indexada (con ISSN)</td>
+              <td>Editorial académica (Oxford, Cambridge, Fondo Editorial UP)</td></tr>
+          <tr><td class="dim">Revisión</td>
+              <td>Revisión por pares ciega</td>
+              <td>Proceso editorial riguroso + dictaminadores</td></tr>
+          <tr><td class="dim">Originalidad</td>
+              <td>Alta: debe aportar algo nuevo al campo</td>
+              <td>Alta: síntesis original o tesis de largo alcance</td></tr>
+          <tr><td class="dim">Audiencia</td>
+              <td>Especialistas del campo</td>
+              <td>Especialistas, estudiantes y público informado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9: (c) TABLA COMPARATIVA 2/2 ============ -->
+  <section class="slide">
+    <p class="kicker v" style="--d:0">c · comparación — segunda parte</p>
+    <h2 class="v" style="--d:1">Minipaper y tesis: <i>aprender y acreditarse</i></h2>
+    <div class="v" style="--d:2">
+      <table class="dos">
+        <thead>
+          <tr><th></th><th>Minipaper</th><th>Tesis</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="dim">Extensión</td>
+              <td>~2–5 páginas (1,000–2,500 palabras)</td>
+              <td>~80–120 pág. (pregrado) hasta 200–400 pág. (doctorado)</td></tr>
+          <tr><td class="dim">Propósito</td>
+              <td>Ejercicio de curso: practicar argumentación con evidencia en un tema muy acotado</td>
+              <td>Obtener un grado académico demostrando dominio del oficio investigador</td></tr>
+          <tr><td class="dim">Dónde vive</td>
+              <td>El aula: se entrega al profesor, no se publica</td>
+              <td>Repositorio institucional de la universidad</td></tr>
+          <tr><td class="dim">Revisión</td>
+              <td>Evaluación del docente (sin revisión por pares)</td>
+              <td>Asesor + <b>jurado experto</b> + defensa oral</td></tr>
+          <tr><td class="dim">Originalidad</td>
+              <td>Moderada: basta una mirada propia bien sustentada (mín. ~3 fuentes)</td>
+              <td>Exigida: contribución propia (máxima en doctorado)</td></tr>
+          <tr><td class="dim">Estructura</td>
+              <td>Simplificada: introducción + breve revisión de literatura + discusión</td>
+              <td>Completa: problema, marco, metodología, resultados, conclusiones</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota v" style="--d:3">Un buen minipaper trabaja una pregunta acotada con el mismo
+       <b>cuidado argumental</b> de una investigación mayor.</p>
+  </section>
+
+  <!-- ============ SLIDE 10: (d) EL EMBUDO ============ -->
+  <section class="slide" style="text-align:center; align-items:center;">
+    <!-- Líneas que convergen: el embudo abstracto -->
+    <svg class="glifo v" style="--d:0" width="min(360px,60vw)" height="84" viewBox="0 0 360 84" fill="none" aria-hidden="true">
+      <g stroke="#c9a45c" stroke-width="1">
+        <path class="traza" d="M10 6 L150 78"  opacity=".9"/>
+        <path class="traza" d="M350 6 L210 78" opacity=".9"/>
+        <path class="traza" d="M70 6 L166 78"  opacity=".5"/>
+        <path class="traza" d="M290 6 L194 78" opacity=".5"/>
+        <path class="traza" d="M130 6 L176 78" opacity=".25"/>
+        <path class="traza" d="M230 6 L184 78" opacity=".25"/>
+      </g>
+      <circle class="lucero" cx="180" cy="80" r="3" fill="#c9a45c"/>
+    </svg>
+    <p class="kicker v" style="--d:1">d · estructura de la investigación</p>
+    <h2 class="v" style="--d:2">La investigación <i>es un embudo</i></h2>
+    <div class="embudo-poema">
+      <p class="verso-embudo e1 v" style="--d:3">El campo amplio
+        <small>se sabe mucho sobre X…</small></p>
+      <p class="gota v" style="--d:4" aria-hidden="true">▾</p>
+      <p class="verso-embudo e2 v" style="--d:4">Tu tema delimitado
+        <small>…dentro de X, me enfoco en este caso, periodo y lugar…</small></p>
+      <p class="gota v" style="--d:5" aria-hidden="true">▾</p>
+      <p class="verso-embudo e3 v" style="--d:5">El vacío
+        <small>…pero nadie ha estudiado esto…</small></p>
+      <p class="gota v" style="--d:6" aria-hidden="true">▾</p>
+      <p class="verso-embudo e4 v" style="--d:6">Tu pregunta
+        <small>por lo tanto, investigo…</small></p>
+    </div>
+    <p class="cita v" style="--d:7; margin-left:auto; margin-right:auto;">“El problema no está ahí afuera.
+      El trabajo de la ciencia consiste en construir el problema.”
+      <span class="autor">Pierre Bourdieu</span></p>
+  </section>
+
+  <!-- ============ SLIDE 11: (d) EL ESQUELETO ============ -->
+  <section class="slide">
+    <p class="kicker v" style="--d:0">d · estructura de la investigación</p>
+    <h2 class="v" style="--d:1">El esqueleto <i>de toda investigación</i></h2>
+    <div class="columna">
+      <!-- Columna vertebral: línea con seis vértebras -->
+      <svg class="espina v" style="--d:2" width="40" height="300" viewBox="0 0 40 300" fill="none" aria-hidden="true" preserveAspectRatio="none">
+        <line class="traza" x1="20" y1="8" x2="20" y2="292" stroke="#c9a45c" stroke-width="1"/>
+        <g fill="#10151f" stroke="#c9a45c" stroke-width="1.2">
+          <circle cx="20" cy="16"  r="6"/>
+          <circle cx="20" cy="70"  r="6"/>
+          <circle cx="20" cy="124" r="6"/>
+          <circle cx="20" cy="178" r="6"/>
+          <circle cx="20" cy="232" r="6"/>
+          <circle cx="20" cy="286" r="6"/>
+        </g>
+      </svg>
+      <ol>
+        <li class="v" style="--d:2"><b><u>Pregunta / problema</u></b> — el corazón del proyecto: precisa, investigable, nacida de un vacío real.</li>
+        <li class="v" style="--d:3"><b><u>Estado del arte / marco</u></b> — el mapa de la conversación: qué se sabe, qué se debate, qué falta.</li>
+        <li class="v" style="--d:4"><b><u>Metodología</u></b> — <i>cómo</i> vas a responder: datos, casos, técnicas; un camino que otros podrían replicar.</li>
+        <li class="v" style="--d:5"><b><u>Resultados / análisis</u></b> — qué encontraste y qué significa para tu pregunta.</li>
+        <li class="v" style="--d:6"><b><u>Conclusiones</u></b> — respuesta, implicancias y limitaciones: el “pero…” honesto.</li>
+        <li class="v" style="--d:7"><b><u>Referencias</u></b> — el territorio intelectual que pisaste. Citar es dialogar.</li>
+      </ol>
+    </div>
+    <p class="nota v" style="--d:8; margin-top:1.1rem">Todo lo anterior conduce a la pregunta; todo lo posterior existe para responderla.</p>
+    <p class="pie v" style="--d:9">Cada disciplina adapta este esqueleto a su manera de probar. En <i>derecho</i>, por ejemplo,
+       la investigación dogmática trabaja con fuentes documentales — normas, jurisprudencia y doctrina — y avanza
+       interpretando esos textos: sus artículos suelen organizarse alrededor del problema jurídico y su análisis,
+       antes que en secciones de metodología y resultados.</p>
+  </section>
+
+  <!-- ============ SLIDE 12: CIERRE ============ -->
+  <section class="slide">
+    <!-- La constelación se cierra: vuelve el cielo de la portada -->
+    <svg class="glifo v" style="--d:0" width="min(320px,55vw)" height="90" viewBox="0 0 320 90" fill="none" aria-hidden="true">
+      <g stroke="#c9a45c" stroke-width="0.7" opacity=".5">
+        <path class="traza" d="M20 70 L95 25 L160 60 L235 18 L300 55"/>
+        <path class="traza" d="M95 25 L160 60 L235 18"/>
+      </g>
+      <g fill="#ece7da">
+        <circle class="lucero"    cx="20"  cy="70" r="2.6"/>
+        <circle class="lucero l2" cx="95"  cy="25" r="3.4"/>
+        <circle class="lucero l3" cx="160" cy="60" r="2.6"/>
+        <circle class="lucero l2" cx="235" cy="18" r="3.4"/>
+        <circle class="lucero"    cx="300" cy="55" r="2.6"/>
+      </g>
+    </svg>
+    <p class="kicker v" style="--d:1">síntesis</p>
+    <h2 class="v" style="--d:2">Cinco ideas <i>para llevarse</i></h2>
+    <ul class="versos">
+      <li class="v" style="--d:3">La ciencia es una <strong>práctica colectiva de validación</strong>: pares, réplica, acumulación, transparencia.</li>
+      <li class="v" style="--d:4">La ciencia tarda porque necesita <strong>filtrar errores, sesgos y afirmaciones débiles</strong>.</li>
+      <li class="v" style="--d:5">Un trabajo académico gana autoridad por su <strong>método, sus fuentes y su evaluación</strong>. Citar es conversar.</li>
+      <li class="v" style="--d:6">Paper, libro, minipaper y tesis comparten ADN; cambian la <strong>escala, el propósito y el evaluador</strong>.</li>
+      <li class="v" style="--d:7">Toda investigación es un <strong>embudo</strong>: de lo general al vacío, del vacío a una pregunta precisa.</li>
+    </ul>
+    <p class="nota v" style="--d:8">Próximo paso: convertir una curiosidad en un tema de investigación riguroso.</p>
+  </section>
+
+</main>
+
+<!-- ============ BARRA DE NAVEGACIÓN ============ -->
+<nav aria-label="Navegación de diapositivas">
+  <button id="btnPrev" class="btn-nav" aria-label="Diapositiva anterior">&#8249;</button>
+  <div id="puntos" role="tablist" aria-label="Ir a diapositiva"></div>
+  <span id="contador" aria-live="polite">1 / 1</span>
+  <button id="btnNext" class="btn-nav" aria-label="Diapositiva siguiente">&#8250;</button>
+</nav>
+<p class="ayuda-teclado">Usa <kbd>←</kbd> <kbd>→</kbd> o <kbd>espacio</kbd></p>
+
+<script>
+/* ==================================================================
+   LÓGICA DE NAVEGACIÓN (idéntica a la versión original):
+   contador y puntos se generan según el nº de <section class="slide">.
+   ================================================================== */
+(function(){
+  "use strict";
+
+  var slides   = document.querySelectorAll(".slide");
+  var btnPrev  = document.getElementById("btnPrev");
+  var btnNext  = document.getElementById("btnNext");
+  var contador = document.getElementById("contador");
+  var puntosEl = document.getElementById("puntos");
+  var actual   = 0;
+  var total    = slides.length;
+
+  for (var i = 0; i < total; i++){
+    (function(idx){
+      var p = document.createElement("button");
+      p.className = "punto";
+      p.setAttribute("aria-label", "Ir a la diapositiva " + (idx + 1));
+      p.addEventListener("click", function(){ irA(idx); });
+      puntosEl.appendChild(p);
+    })(i);
+  }
+  var puntos = puntosEl.querySelectorAll(".punto");
+
+  function irA(n){
+    if (n < 0 || n >= total) return;
+    slides[actual].classList.remove("activa");
+    puntos[actual].classList.remove("activo");
+    actual = n;
+    slides[actual].classList.add("activa");
+    puntos[actual].classList.add("activo");
+    slides[actual].scrollTop = 0;
+    contador.textContent = (actual + 1) + " / " + total;
+    btnPrev.disabled = (actual === 0);
+    btnNext.disabled = (actual === total - 1);
+  }
+
+  function siguiente(){ irA(actual + 1); }
+  function anterior(){  irA(actual - 1); }
+
+  btnNext.addEventListener("click", siguiente);
+  btnPrev.addEventListener("click", anterior);
+
+  document.addEventListener("keydown", function(e){
+    if (e.key === "ArrowRight"){ e.preventDefault(); siguiente(); }
+    else if (e.key === "ArrowLeft"){ e.preventDefault(); anterior(); }
+    else if (e.key === " " || e.code === "Space"){
+      if (document.activeElement && document.activeElement.tagName === "BUTTON") return;
+      e.preventDefault(); siguiente();
+    }
+  });
+
+  irA(0);
+})();
+</script>
+
+</body>
+</html>
